@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
+import com.example.demo.model.UserDTO;
 import com.example.demo.service.KafkaProducerService;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,10 @@ public class UserController {
     @Autowired
     private KafkaProducerService kafkaProducerService;
 
-    @PostMapping("/createUser")
-    public User createUser(@RequestBody User user) {
-        kafkaProducerService.sendMessage(user);
-        return user;
+    @PostMapping
+    public UserDTO createUser(@RequestBody UserDTO userDTO) {
+        kafkaProducerService.sendMessage(userDTO);
+        return userDTO;
     }
 
     @GetMapping
@@ -31,11 +32,23 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(id);
+        userDTO.setMethod("read");
+        kafkaProducerService.sendMessage(userDTO);
         return userService.getUserById(id);
     }
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(id);
+        userDTO.setMethod("delete");
+        kafkaProducerService.sendMessage(userDTO);
+    }
+
+    @PutMapping
+    public void updateUser(@RequestBody UserDTO userDTO) {
+        kafkaProducerService.sendMessage(userDTO);
     }
 }
