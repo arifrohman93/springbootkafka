@@ -40,15 +40,17 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public String deleteUser(@PathVariable Long id) {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(id);
         userDTO.setMethod("delete");
         kafkaProducerService.sendMessage(userDTO);
+        return "Success delete";
     }
 
     @PutMapping
-    public void updateUser(@RequestBody UserDTO userDTO) {
+    public String updateUser(@RequestBody UserDTO userDTO) {
         kafkaProducerService.sendMessage(userDTO);
+        return "Success update";
     }
 }
